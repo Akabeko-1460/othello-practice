@@ -1,21 +1,31 @@
-'use client';
+"use client";
 
-import { useReducer, useCallback, useRef, useEffect, useState } from 'react';
+import { useReducer, useCallback, useRef, useEffect, useState } from "react";
 import {
-  type GameState, type GameSettings, type GameAction, type GameStore,
-  type ValidMove, type MoveEvaluation,
-  BLACK, WHITE, EMPTY,
-} from '@/lib/othello/types';
-import { createBoard, countAll, opponent } from '@/lib/othello/board';
-import { getValidMoves, getValidMovesWithOpenness, applyMove } from '@/lib/othello/rules';
-import { getAIMove } from '@/lib/othello/ai';
-import { evaluateMoveQuality } from '@/lib/othello/ai/advanced';
-import { isCorner, isXSquare, isCSquare } from '@/lib/othello/board';
-import { calculateOpenness } from '@/lib/othello/rules';
+  type GameState,
+  type GameSettings,
+  type GameAction,
+  type GameStore,
+  type ValidMove,
+  type MoveEvaluation,
+  BLACK,
+  WHITE,
+  EMPTY,
+} from "@/lib/othello/types";
+import { createBoard, countAll, opponent } from "@/lib/othello/board";
+import {
+  getValidMoves,
+  getValidMovesWithOpenness,
+  applyMove,
+} from "@/lib/othello/rules";
+import { getAIMove } from "@/lib/othello/ai";
+import { evaluateMoveQuality } from "@/lib/othello/ai/advanced";
+import { isCorner, isXSquare, isCSquare } from "@/lib/othello/board";
+import { calculateOpenness } from "@/lib/othello/rules";
 
 const DEFAULT_SETTINGS: GameSettings = {
-  mode: 'cpu',
-  aiLevel: 'beginner',
+  mode: "cpu",
+  aiLevel: "beginner",
   playerColor: BLACK,
   showOpenness: false,
   evaluationMode: false,
@@ -39,7 +49,12 @@ function createInitialState(board?: Int8Array): GameState {
   };
 }
 
-function updateState(board: Int8Array, currentPlayer: 1 | -1, lastMove: { row: number; col: number } | null, moveHistory: { row: number; col: number }[]): GameState {
+function updateState(
+  board: Int8Array,
+  currentPlayer: 1 | -1,
+  lastMove: { row: number; col: number } | null,
+  moveHistory: { row: number; col: number }[],
+): GameState {
   const nextPlayer = opponent(currentPlayer);
   const nextMoves = getValidMoves(board, nextPlayer);
   const counts = countAll(board);
@@ -94,23 +109,48 @@ function updateState(board: Int8Array, currentPlayer: 1 | -1, lastMove: { row: n
 
 function gameReducer(store: GameStore, action: GameAction): GameStore {
   switch (action.type) {
-    case 'INIT':
+    case "INIT":
       return {
         settings: { ...action.settings },
         state: createInitialState(),
       };
 
-    case 'PLACE_STONE':
-    case 'CPU_MOVE': {
+    case "PLACE_STONE": {
       const { move } = action;
       const { state, settings } = store;
       const newBoard = applyMove(state.board, move, state.currentPlayer);
-      const newHistory = [...state.moveHistory, { row: move.row, col: move.col }];
-      const newState = updateState(newBoard, state.currentPlayer, { row: move.row, col: move.col }, newHistory);
+      const newHistory = [
+        ...state.moveHistory,
+        { row: move.row, col: move.col },
+      ];
+      const newState = updateState(
+        newBoard,
+        state.currentPlayer,
+        { row: move.row, col: move.col },
+        newHistory,
+      );
       return { settings, state: newState };
     }
 
-    case 'PASS': {
+    case "CPU_MOVE": {
+      const { move } = action;
+      const { state, settings } = store;
+      const newBoard = applyMove(state.board, move, state.currentPlayer);
+      const newHistory = [
+        ...state.moveHistory,
+        { row: move.row, col: move.col },
+      ];
+      const newState = updateState(
+        newBoard,
+        state.currentPlayer,
+        { row: move.row, col: move.col },
+        newHistory,
+      );
+      // Preserve evaluation during CPU move - only clear when player makes a move
+      return { settings, state: { ...newState, evaluation: state.evaluation } };
+    }
+
+    case "PASS": {
       const { state, settings } = store;
       const nextPlayer = opponent(state.currentPlayer);
       const nextMoves = getValidMoves(state.board, nextPlayer);
@@ -125,19 +165,22 @@ function gameReducer(store: GameStore, action: GameAction): GameStore {
       };
     }
 
-    case 'TOGGLE_OPENNESS':
+    case "TOGGLE_OPENNESS":
       return {
         ...store,
-        settings: { ...store.settings, showOpenness: !store.settings.showOpenness },
+        settings: {
+          ...store.settings,
+          showOpenness: !store.settings.showOpenness,
+        },
       };
 
-    case 'SET_EVALUATION':
+    case "SET_EVALUATION":
       return {
         ...store,
         state: { ...store.state, evaluation: action.evaluation },
       };
 
-    case 'RESET':
+    case "RESET":
       return {
         settings: store.settings,
         state: createInitialState(),
@@ -150,28 +193,30 @@ function gameReducer(store: GameStore, action: GameAction): GameStore {
 
 function generateEvalMessage(
   move: ValidMove,
-  quality: 'good' | 'ok' | 'bad',
+  quality: "good" | "ok" | "bad",
   bestMove: ValidMove | null,
-  board: Int8Array
+  board: Int8Array,
 ): string {
-  if (quality === 'good') {
-    if (isCorner(move.row, move.col)) return '隅を取る好手です！';
+  if (quality === "good") {
+    if (isCorner(move.row, move.col)) return "隅を取る好手です！";
     const openness = calculateOpenness(board, move);
-    if (openness <= 1) return '開放度の低い中割りの好手です！';
-    return '良い手です！盤面を有利に進めています。';
+    if (openness <= 1) return "開放度の低い中割りの好手です！";
+    return "良い手です！盤面を有利に進めています。";
   }
-  if (quality === 'ok') {
-    return 'まずまずの手です。悪くはありませんが、より良い手もありました。';
+  if (quality === "ok") {
+    return "まずまずの手です。悪くはありませんが、より良い手もありました。";
   }
   // bad
-  if (isXSquare(move.row, move.col)) return 'X打ちは隅を取られやすく危険です！';
-  if (isCSquare(move.row, move.col)) return '理由のないC打ちは隅を取られるリスクがあります。';
+  if (isXSquare(move.row, move.col)) return "X打ちは隅を取られやすく危険です！";
+  if (isCSquare(move.row, move.col))
+    return "理由のないC打ちは隅を取られるリスクがあります。";
   if (bestMove && isCorner(bestMove.row, bestMove.col)) {
     return `隅(${String.fromCharCode(97 + bestMove.col)}${bestMove.row + 1})を取るチャンスを逃しました！`;
   }
   const openness = calculateOpenness(board, move);
-  if (openness >= 5) return '開放度が高すぎます。もっと少なく返せる手を探しましょう。';
-  return '相手に有利な展開になりそうです。石の取りすぎに注意しましょう。';
+  if (openness >= 5)
+    return "開放度が高すぎます。もっと少なく返せる手を探しましょう。";
+  return "相手に有利な展開になりそうです。石の取りすぎに注意しましょう。";
 }
 
 export function useGame() {
@@ -193,8 +238,8 @@ export function useGame() {
     ? getValidMovesWithOpenness(state.board, state.currentPlayer)
     : state.validMoves;
 
-  const isPlayerTurn = settings.mode === 'local' ||
-    state.currentPlayer === settings.playerColor;
+  const isPlayerTurn =
+    settings.mode === "local" || state.currentPlayer === settings.playerColor;
 
   // Animate flips
   const animateMove = useCallback((move: ValidMove) => {
@@ -207,32 +252,56 @@ export function useGame() {
   }, []);
 
   // Handle player move
-  const placeStone = useCallback((move: ValidMove) => {
-    if (!isPlayerTurn || isThinking || state.isGameOver) return;
+  const placeStone = useCallback(
+    (move: ValidMove) => {
+      if (!isPlayerTurn || isThinking || state.isGameOver) return;
 
-    const boardBefore = new Int8Array(state.board);
-    animateMove(move);
+      const boardBefore = new Int8Array(state.board);
+      animateMove(move);
 
-    // Evaluate if in evaluation mode
-    if (settings.evaluationMode && settings.mode === 'cpu') {
-      const { score, bestMove, bestScore } = evaluateMoveQuality(boardBefore, state.currentPlayer, move);
-      const diff = bestScore - score;
-      let quality: 'good' | 'ok' | 'bad';
-      if (diff <= 3) quality = 'good';
-      else if (diff <= 15) quality = 'ok';
-      else quality = 'bad';
+      // Evaluate if in evaluation mode
+      if (settings.evaluationMode && settings.mode === "cpu") {
+        const { score, bestMove, bestScore } = evaluateMoveQuality(
+          boardBefore,
+          state.currentPlayer,
+          move,
+        );
+        const diff = bestScore - score;
+        let quality: "good" | "ok" | "bad";
+        if (diff <= 3) quality = "good";
+        else if (diff <= 15) quality = "ok";
+        else quality = "bad";
 
-      const message = generateEvalMessage(move, quality, bestMove, boardBefore);
-      dispatch({ type: 'PLACE_STONE', move });
-      dispatch({ type: 'SET_EVALUATION', evaluation: { quality, message, bestMove, scoreDiff: diff } });
-    } else {
-      dispatch({ type: 'PLACE_STONE', move });
-    }
-  }, [isPlayerTurn, isThinking, state.isGameOver, state.board, state.currentPlayer, settings, animateMove]);
+        const message = generateEvalMessage(
+          move,
+          quality,
+          bestMove,
+          boardBefore,
+        );
+        dispatch({ type: "PLACE_STONE", move });
+        dispatch({
+          type: "SET_EVALUATION",
+          evaluation: { quality, message, bestMove, scoreDiff: diff },
+        });
+      } else {
+        dispatch({ type: "PLACE_STONE", move });
+      }
+    },
+    [
+      isPlayerTurn,
+      isThinking,
+      state.isGameOver,
+      state.board,
+      state.currentPlayer,
+      state.evaluation,
+      settings,
+      animateMove,
+    ],
+  );
 
   // CPU move effect
   useEffect(() => {
-    if (settings.mode !== 'cpu') return;
+    if (settings.mode !== "cpu") return;
     if (state.isGameOver) return;
     if (state.currentPlayer === settings.playerColor) return;
     if (thinkingRef.current) return;
@@ -241,37 +310,57 @@ export function useGame() {
     if (state.validMoves.length === 0) return;
 
     thinkingRef.current = true;
-    setIsThinking(true);
 
-    const timer = setTimeout(() => {
-      const move = getAIMove(state.board, state.currentPlayer, settings.aiLevel);
-      if (move) {
-        animateMove(move);
-        dispatch({ type: 'CPU_MOVE', move });
-      }
-      thinkingRef.current = false;
-      setIsThinking(false);
-    }, settings.aiLevel === 'advanced' ? 100 : 500);
+    const timer = setTimeout(
+      () => {
+        setIsThinking(true);
+        const move = getAIMove(
+          state.board,
+          state.currentPlayer,
+          settings.aiLevel,
+        );
+        if (move) {
+          animateMove(move);
+          dispatch({ type: "CPU_MOVE", move });
+        }
+        thinkingRef.current = false;
+        setIsThinking(false);
+      },
+      settings.aiLevel === "advanced" ? 100 : 500,
+    );
 
     return () => {
       clearTimeout(timer);
       thinkingRef.current = false;
       setIsThinking(false);
     };
-  }, [state.currentPlayer, state.isGameOver, state.board, settings, animateMove, state.validMoves.length]);
+  }, [
+    state.currentPlayer,
+    state.isGameOver,
+    state.board,
+    settings,
+    animateMove,
+    state.validMoves.length,
+  ]);
 
   // Pass detection
   useEffect(() => {
     if (state.passCount > 0 && !state.isGameOver) {
-      const passingPlayer = state.currentPlayer === BLACK ? 'WHITE' : 'BLACK';
-      setPassMessage(`${passingPlayer === 'BLACK' ? '黒' : '白'}はパスです`);
-      const timer = setTimeout(() => setPassMessage(null), 1500);
-      return () => clearTimeout(timer);
+      const passingPlayer = state.currentPlayer === BLACK ? "WHITE" : "BLACK";
+      const message = `${passingPlayer === "BLACK" ? "黒" : "白"}はパスです`;
+
+      // Use setTimeout to avoid synchronous setState in effect
+      const showTimer = setTimeout(() => setPassMessage(message), 0);
+      const hideTimer = setTimeout(() => setPassMessage(null), 1500);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
     }
   }, [state.passCount, state.currentPlayer, state.isGameOver]);
 
   const initGame = useCallback((newSettings: GameSettings) => {
-    dispatch({ type: 'INIT', settings: newSettings });
+    dispatch({ type: "INIT", settings: newSettings });
     setFlippingCells(new Set());
     setNewCell(null);
     setIsThinking(false);
@@ -279,7 +368,7 @@ export function useGame() {
   }, []);
 
   const resetGame = useCallback(() => {
-    dispatch({ type: 'RESET' });
+    dispatch({ type: "RESET" });
     setFlippingCells(new Set());
     setNewCell(null);
     setIsThinking(false);
@@ -287,11 +376,11 @@ export function useGame() {
   }, []);
 
   const toggleOpenness = useCallback(() => {
-    dispatch({ type: 'TOGGLE_OPENNESS' });
+    dispatch({ type: "TOGGLE_OPENNESS" });
   }, []);
 
   const clearEvaluation = useCallback(() => {
-    dispatch({ type: 'SET_EVALUATION', evaluation: null });
+    dispatch({ type: "SET_EVALUATION", evaluation: null });
   }, []);
 
   return {

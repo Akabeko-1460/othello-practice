@@ -1,17 +1,13 @@
-import { type BoardArray, type Player, BLACK, WHITE, EMPTY } from './types';
-import { getCell, isOnBoard, opponent, countStones } from './board';
-import { getValidMoves } from './rules';
+import { type BoardArray, type Player, BLACK, WHITE } from "./types";
+import { getCell, opponent, countStones } from "./board";
+import { getValidMoves } from "./rules";
 
 /** Position weight matrix */
 export const POSITION_WEIGHTS = new Int8Array([
-  100, -20,  10,   5,   5,  10, -20, 100,
-  -20, -50,  -2,  -2,  -2,  -2, -50, -20,
-   10,  -2,   1,   1,   1,   1,  -2,  10,
-    5,  -2,   1,   0,   0,   1,  -2,   5,
-    5,  -2,   1,   0,   0,   1,  -2,   5,
-   10,  -2,   1,   1,   1,   1,  -2,  10,
-  -20, -50,  -2,  -2,  -2,  -2, -50, -20,
-  100, -20,  10,   5,   5,  10, -20, 100,
+  100, -20, 10, 5, 5, 10, -20, 100, -20, -50, -2, -2, -2, -2, -50, -20, 10, -2,
+  1, 1, 1, 1, -2, 10, 5, -2, 1, 0, 0, 1, -2, 5, 5, -2, 1, 0, 0, 1, -2, 5, 10,
+  -2, 1, 1, 1, 1, -2, 10, -20, -50, -2, -2, -2, -2, -50, -20, 100, -20, 10, 5,
+  5, 10, -20, 100,
 ]);
 
 /** Evaluate position weight score for a player */
@@ -68,7 +64,11 @@ export function countStableStones(board: BoardArray, player: Player): number {
     for (let r = startR + dr; r >= 0 && r < 8; r += dr) {
       if (!stable[r * 8 + startC]) break;
       for (let c = startC + dc; c >= 0 && c < 8; c += dc) {
-        if (getCell(board, r, c) === player && stable[r * 8 + (c - dc)] && stable[(r - dr) * 8 + c]) {
+        if (
+          getCell(board, r, c) === player &&
+          stable[r * 8 + (c - dc)] &&
+          stable[(r - dr) * 8 + c]
+        ) {
           stable[r * 8 + c] = 1;
         } else break;
       }
