@@ -132,9 +132,9 @@ export const BEGINNER_CONCEPTS: GuideConcept[] = [
         initialPlayer: BLACK,
         steps: [
           {
-            comment: 'この局面で辺に打つとどうなるか見てみましょう。赤いマスが危険な辺のマスです。',
-            tag: 'info',
-            highlights: [1, 5, 16, 17, 40],
+            comment: 'この局面で辺に打つとどうなるか見てみましょう。黄色いマスが危険な辺のマスです。',
+            tag: 'warning',
+            highlights: [1, 5, 16, 40],
           },
           {
             // BLACK a3(2,0): direction(0,1): (2,1)=B own → NO. direction(1,1): (3,1)=_ → NO.
@@ -289,7 +289,7 @@ export const BEGINNER_CONCEPTS: GuideConcept[] = [
             // d2(1,3): direction(1,0): (2,3)=B(opp), (3,3)=W(own) → flip(2,3) 1方向1枚 ✓
             move: { row: 1, col: 3 },
             player: WHITE,
-            comment: '白d2。d3の黒石を縦方向に1つだけ返す一方向返し。返した石は周囲を石に囲まれているので開放度が低く、好手です。',
+            comment: '白d2。d3の黒石を縦方向に1つだけ返す一方向返し。返した石の周囲の空きマスが少なく（開放度2）、好手です。',
             tag: 'good',
           },
         ],
@@ -328,7 +328,7 @@ export const BEGINNER_CONCEPTS: GuideConcept[] = [
         steps: [
           {
             comment: '黒の手番です。a1（緑ハイライト）に打てるチャンスがあります！',
-            tag: 'info',
+            tag: 'good',
             highlights: [0],
           },
           {
@@ -339,7 +339,7 @@ export const BEGINNER_CONCEPTS: GuideConcept[] = [
           },
           {
             comment: '隅から辺に沿って並ぶ石（緑ハイライト）は全て確定石です。隅を取ったら辺に石を伸ばして確定石を増やしましょう。',
-            tag: 'info',
+            tag: 'good',
             highlights: [0, 1, 2, 3, 4, 8, 16, 24],
           },
         ],
@@ -391,7 +391,7 @@ export const BEGINNER_CONCEPTS: GuideConcept[] = [
         steps: [
           {
             comment: '赤いマスがX打ちの位置（隅の斜め隣）です。ここに打つのは危険です。',
-            tag: 'warning',
+            tag: 'bad',
             highlights: [9, 14, 49, 54],
           },
           {

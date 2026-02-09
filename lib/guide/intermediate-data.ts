@@ -110,7 +110,7 @@ export const INTERMEDIATE_CONCEPTS: GuideConcept[] = [
       {
         title: '偶数理論の基本',
         description: '偶数個の空きでは後手が最後の手を打てます。',
-        // 終盤: 4つの空きが1つの領域にある
+        // 終盤: 2つの空きが1つの領域にある
         initialBoard: [
           B,B,B,B,B,B,B,B,
           B,B,B,B,B,B,W,W,
@@ -118,7 +118,7 @@ export const INTERMEDIATE_CONCEPTS: GuideConcept[] = [
           B,B,B,B,W,W,W,W,
           B,B,B,W,W,W,W,W,
           B,B,W,W,W,W,W,W,
-          B,W,W,W,W,W,W,_,
+          B,W,W,W,W,W,W,W,
           W,W,W,W,W,W,_,_,
         ],
         initialPlayer: BLACK,
@@ -126,7 +126,7 @@ export const INTERMEDIATE_CONCEPTS: GuideConcept[] = [
           {
             comment: '終盤です。空きマスが2つ（青ハイライト）あり、1つの領域です。偶数個の空きでは後手（白）が有利です。',
             tag: 'info',
-            highlights: [55, 62, 63],
+            highlights: [62, 63],
           },
           {
             // g8(7,6): direction(0,-1): (7,5)=W(opp),...,(7,0)=W → no B → NO
@@ -220,7 +220,7 @@ export const INTERMEDIATE_CONCEPTS: GuideConcept[] = [
         initialPlayer: BLACK,
         steps: [
           {
-            comment: '黒の手番です。上辺に白が4個並んでいます。後でストナーを仕掛けるため、辺に種石を打ちます。',
+            comment: '黒の手番です。2行目（c2〜f2）に白が4個並んでいます。後でストナーを仕掛けるため、辺に種石を打ちます。',
             tag: 'info',
             highlights: [10, 11, 12, 13],
           },
@@ -234,7 +234,7 @@ export const INTERMEDIATE_CONCEPTS: GuideConcept[] = [
           },
           {
             comment: '種石（緑ハイライト）があることで、後からC打ちで辺の白を一気に返す「ストナー」が成立します。数手先を読んで種石を仕込むのが上級者の技術です。',
-            tag: 'info',
+            tag: 'good',
             highlights: [5],
           },
         ],

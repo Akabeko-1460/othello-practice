@@ -84,7 +84,7 @@ export const ELEMENTARY_CONCEPTS: GuideConcept[] = [
             highlights: [2, 3, 4],
           },
           {
-            comment: '山の弱点: 隅（赤ハイライト）が空いているため、隅を取られると山全体が崩れる危険があります。',
+            comment: '山の弱点: 隅（黄色ハイライト）が空いているため、隅を取られると山全体が崩れる危険があります。',
             tag: 'warning',
             highlights: [0, 7],
           },
