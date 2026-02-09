@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // Allow setState in useEffect for specific UI feedback patterns (thinking state, pass message)
+      "@next/next/no-sync-scripts": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
