@@ -1,26 +1,213 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafaf8;
+  --foreground: #18181b;
+  --surface: #ffffff;
+  --surface-dim: #f4f4f5;
+  --surface-hover: #e4e4e7;
+
+  /* Board theme */
+  --board-bg: #1b7a3d;
+  --board-bg-light: #239b4e;
+  --board-border: #145a2c;
+  --board-line: rgba(0, 0, 0, 0.18);
+  --board-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.12);
+  --cell-hover: rgba(255, 255, 255, 0.12);
+  --cell-valid: rgba(255, 255, 200, 0.55);
+
+  /* Stone colors */
+  --stone-black: #1a1a1a;
+  --stone-white: #f5f5f5;
+  --stone-black-shadow: rgba(0, 0, 0, 0.5);
+  --stone-white-shadow: rgba(0, 0, 0, 0.18);
+  --stone-black-highlight: rgba(255, 255, 255, 0.15);
+  --stone-white-highlight: rgba(255, 255, 255, 0.9);
+
+  /* Accent colors */
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-light: #dbeafe;
+  --good: #16a34a;
+  --good-light: #dcfce7;
+  --ok: #ca8a04;
+  --ok-light: #fef9c3;
+  --bad: #dc2626;
+  --bad-light: #fee2e2;
+
+  /* Header */
+  --header-bg: #0f4d25;
+  --header-text: #ffffff;
+
+  /* Misc */
+  --border: #e4e4e7;
+  --border-hover: #a1a1aa;
+  --text-muted: #71717a;
+  --text-dim: #a1a1aa;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-hover: var(--surface-hover);
+  --color-board-bg: var(--board-bg);
+  --color-board-bg-light: var(--board-bg-light);
+  --color-board-border: var(--board-border);
+  --color-board-line: var(--board-line);
+  --color-cell-hover: var(--cell-hover);
+  --color-cell-valid: var(--cell-valid);
+  --color-stone-black: var(--stone-black);
+  --color-stone-white: var(--stone-white);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-good: var(--good);
+  --color-good-light: var(--good-light);
+  --color-ok: var(--ok);
+  --color-ok-light: var(--ok-light);
+  --color-bad: var(--bad);
+  --color-bad-light: var(--bad-light);
+  --color-header-bg: var(--header-bg);
+  --color-header-text: var(--header-text);
+  --color-border: var(--border);
+  --color-border-hover: var(--border-hover);
+  --color-text-muted: var(--text-muted);
+  --color-text-dim: var(--text-dim);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Animations ===== */
+@keyframes flip-stone {
+  0% { transform: scale(1) rotateY(0deg); }
+  50% { transform: scale(1.05) rotateY(90deg); }
+  100% { transform: scale(1) rotateY(0deg); }
+}
+
+@keyframes place-stone {
+  0% { transform: scale(0) translateY(-8px); opacity: 0; }
+  60% { transform: scale(1.08) translateY(0); }
+  80% { transform: scale(0.96); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse-valid {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 0.85; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.animate-flip {
+  animation: flip-stone 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-place {
+  animation: place-stone 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-valid {
+  animation: pulse-valid 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.08) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ===== Board Surface Texture ===== */
+.board-surface {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.06) 0%, transparent 50%),
+    linear-gradient(135deg, var(--board-bg-light) 0%, var(--board-bg) 50%, #166534 100%);
+}
+
+/* ===== Card hover effect ===== */
+.card-interactive {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Button base ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-secondary {
+  background: var(--surface-dim);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+
+/* ===== Scrollbar ===== */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
 }
