@@ -17,7 +17,13 @@ export interface ValidMove extends Move {
   openness?: number; // sum of adjacent empty cells for flipped stones
 }
 
-export type AILevel = "beginner" | "elementary" | "intermediate" | "advanced";
+export type AILevel =
+  | "beginner"
+  | "elementary"
+  | "intermediate"
+  | "semi_advanced"
+  | "advanced"
+  | "expert";
 export type GameMode = "cpu" | "local";
 
 export interface GameSettings {

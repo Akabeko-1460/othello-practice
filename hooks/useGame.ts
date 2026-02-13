@@ -7,10 +7,7 @@ import {
   type GameAction,
   type GameStore,
   type ValidMove,
-  type MoveEvaluation,
   BLACK,
-  WHITE,
-  EMPTY,
 } from "@/lib/othello/types";
 import { createBoard, countAll, opponent } from "@/lib/othello/board";
 import {
@@ -318,7 +315,6 @@ export function useGame() {
       state.isGameOver,
       state.board,
       state.currentPlayer,
-      state.evaluation,
       settings,
       animateMove,
     ],
@@ -351,7 +347,11 @@ export function useGame() {
         thinkingRef.current = false;
         setIsThinking(false);
       },
-      settings.aiLevel === "advanced" ? 100 : 500,
+      settings.aiLevel === "advanced" ||
+        settings.aiLevel === "semi_advanced" ||
+        settings.aiLevel === "expert"
+        ? 100
+        : 500,
     );
 
     return () => {

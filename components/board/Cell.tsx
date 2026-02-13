@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { type CellState, type ValidMove } from '@/lib/othello/types';
-import Stone from './Stone';
+import { type CellState, type ValidMove } from "@/lib/othello/types";
+import Stone from "./Stone";
 
-export type HighlightColor = 'blue' | 'red' | 'green' | 'yellow';
+export type HighlightColor = "blue" | "red" | "green" | "yellow";
 
 interface CellProps {
   row: number;
@@ -19,15 +19,14 @@ interface CellProps {
 }
 
 const HIGHLIGHT_STYLES: Record<HighlightColor, string> = {
-  blue: 'bg-blue-400/30 ring-1 ring-blue-400/50',
-  red: 'bg-red-400/30 ring-1 ring-red-400/50',
-  green: 'bg-green-400/30 ring-1 ring-green-400/50',
-  yellow: 'bg-yellow-400/30 ring-1 ring-yellow-400/50',
+  blue: "bg-blue-400/30 ring-1 ring-blue-400/50",
+  red: "bg-red-400/30 ring-1 ring-red-400/50",
+  green: "bg-green-400/30 ring-1 ring-green-400/50",
+  yellow: "bg-yellow-400/30 ring-1 ring-yellow-400/50",
 };
 
 export default function Cell({
-  row,
-  col,
+  // row and col are part of CellProps but not used in the function body
   value,
   validMove,
   showOpenness,
@@ -47,13 +46,15 @@ export default function Cell({
         relative flex items-center justify-center
         border-[0.5px] border-board-line aspect-square
         transition-colors duration-100
-        ${validMove ? 'cursor-pointer hover:bg-cell-hover' : ''}
+        ${validMove ? "cursor-pointer hover:bg-cell-hover" : ""}
       `}
       onClick={handleClick}
     >
       {/* Highlight overlay */}
       {highlight && (
-        <div className={`absolute inset-0 ${HIGHLIGHT_STYLES[highlight]} pointer-events-none`} />
+        <div
+          className={`absolute inset-0 ${HIGHLIGHT_STYLES[highlight]} pointer-events-none`}
+        />
       )}
 
       {/* Last move indicator */}
@@ -78,11 +79,12 @@ export default function Cell({
         <span
           className="absolute bottom-0 right-0.5 text-[9px] font-bold leading-none tabular-nums"
           style={{
-            color: validMove.openness <= 2
-              ? 'rgba(134,239,172,0.9)'
-              : validMove.openness <= 4
-              ? 'rgba(253,224,71,0.9)'
-              : 'rgba(252,165,165,0.9)',
+            color:
+              validMove.openness <= 2
+                ? "rgba(134,239,172,0.9)"
+                : validMove.openness <= 4
+                  ? "rgba(253,224,71,0.9)"
+                  : "rgba(252,165,165,0.9)",
           }}
         >
           {validMove.openness}
