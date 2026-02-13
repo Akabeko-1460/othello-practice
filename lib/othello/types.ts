@@ -17,8 +17,8 @@ export interface ValidMove extends Move {
   openness?: number; // sum of adjacent empty cells for flipped stones
 }
 
-export type AILevel = 'beginner' | 'elementary' | 'intermediate' | 'advanced';
-export type GameMode = 'cpu' | 'local';
+export type AILevel = "beginner" | "elementary" | "intermediate" | "advanced";
+export type GameMode = "cpu" | "local";
 
 export interface GameSettings {
   mode: GameMode;
@@ -29,7 +29,7 @@ export interface GameSettings {
 }
 
 export interface MoveEvaluation {
-  quality: 'good' | 'ok' | 'bad';
+  quality: "good" | "ok" | "bad";
   message: string;
   bestMove: ValidMove | null;
   scoreDiff: number;
@@ -49,15 +49,17 @@ export interface GameState {
 }
 
 export type GameAction =
-  | { type: 'INIT'; settings: GameSettings }
-  | { type: 'PLACE_STONE'; move: ValidMove }
-  | { type: 'CPU_MOVE'; move: ValidMove }
-  | { type: 'PASS' }
-  | { type: 'TOGGLE_OPENNESS' }
-  | { type: 'SET_EVALUATION'; evaluation: MoveEvaluation | null }
-  | { type: 'RESET' };
+  | { type: "INIT"; settings: GameSettings }
+  | { type: "PLACE_STONE"; move: ValidMove }
+  | { type: "CPU_MOVE"; move: ValidMove }
+  | { type: "PASS" }
+  | { type: "TOGGLE_OPENNESS" }
+  | { type: "SET_EVALUATION"; evaluation: MoveEvaluation | null }
+  | { type: "UNDO"; steps: number }
+  | { type: "RESET" };
 
 export interface GameStore {
   settings: GameSettings;
   state: GameState;
+  stateHistory: GameState[];
 }

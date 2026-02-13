@@ -113,11 +113,12 @@ function gameReducer(store: GameStore, action: GameAction): GameStore {
       return {
         settings: { ...action.settings },
         state: createInitialState(),
+        stateHistory: [],
       };
 
     case "PLACE_STONE": {
       const { move } = action;
-      const { state, settings } = store;
+      const { state, settings, stateHistory } = store;
       const newBoard = applyMove(state.board, move, state.currentPlayer);
       const newHistory = [
         ...state.moveHistory,
@@ -129,12 +130,16 @@ function gameReducer(store: GameStore, action: GameAction): GameStore {
         { row: move.row, col: move.col },
         newHistory,
       );
-      return { settings, state: newState };
+      return {
+        settings,
+        state: newState,
+        stateHistory: [...stateHistory, state],
+      };
     }
 
     case "CPU_MOVE": {
       const { move } = action;
-      const { state, settings } = store;
+      const { state, settings, stateHistory } = store;
       const newBoard = applyMove(state.board, move, state.currentPlayer);
       const newHistory = [
         ...state.moveHistory,
@@ -147,11 +152,15 @@ function gameReducer(store: GameStore, action: GameAction): GameStore {
         newHistory,
       );
       // Preserve evaluation during CPU move - only clear when player makes a move
-      return { settings, state: { ...newState, evaluation: state.evaluation } };
+      return {
+        settings,
+        state: { ...newState, evaluation: state.evaluation },
+        stateHistory: [...stateHistory, state],
+      };
     }
 
     case "PASS": {
-      const { state, settings } = store;
+      const { state, settings, stateHistory } = store;
       const nextPlayer = opponent(state.currentPlayer);
       const nextMoves = getValidMoves(state.board, nextPlayer);
       return {
@@ -162,6 +171,7 @@ function gameReducer(store: GameStore, action: GameAction): GameStore {
           validMoves: nextMoves,
           passCount: state.passCount + 1,
         },
+        stateHistory,
       };
     }
 
@@ -180,10 +190,24 @@ function gameReducer(store: GameStore, action: GameAction): GameStore {
         state: { ...store.state, evaluation: action.evaluation },
       };
 
+    case "UNDO": {
+      const { stateHistory, settings } = store;
+      const steps = Math.min(action.steps, stateHistory.length);
+      if (steps === 0) return store;
+      const newHistory = stateHistory.slice(0, -steps);
+      const restoredState = stateHistory[stateHistory.length - steps];
+      return {
+        settings,
+        state: { ...restoredState, evaluation: null },
+        stateHistory: newHistory,
+      };
+    }
+
     case "RESET":
       return {
         settings: store.settings,
         state: createInitialState(),
+        stateHistory: [],
       };
 
     default:
@@ -223,6 +247,7 @@ export function useGame() {
   const [store, dispatch] = useReducer(gameReducer, {
     settings: DEFAULT_SETTINGS,
     state: createInitialState(),
+    stateHistory: [],
   });
 
   const [flippingCells, setFlippingCells] = useState<Set<number>>(new Set());
@@ -383,6 +408,20 @@ export function useGame() {
     dispatch({ type: "SET_EVALUATION", evaluation: null });
   }, []);
 
+  // Undo: CPU mode = 2 steps (player + CPU), local mode = 1 step
+  const undoMove = useCallback(() => {
+    if (isThinking) return;
+    const steps = settings.mode === "cpu" ? 2 : 1;
+    dispatch({ type: "UNDO", steps });
+    setFlippingCells(new Set());
+    setNewCell(null);
+  }, [settings.mode, isThinking]);
+
+  const canUndo =
+    store.stateHistory.length >= (settings.mode === "cpu" ? 2 : 1) &&
+    !isThinking &&
+    !state.isGameOver;
+
   return {
     settings,
     state,
@@ -397,5 +436,7 @@ export function useGame() {
     resetGame,
     toggleOpenness,
     clearEvaluation,
+    undoMove,
+    canUndo,
   };
 }
