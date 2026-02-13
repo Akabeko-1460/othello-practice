@@ -1,19 +1,22 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import { useGame } from '@/hooks/useGame';
-import Board from '@/components/board/Board';
-import GameInfo from './GameInfo';
-import MoveEvaluationDisplay from './MoveEvaluation';
-import GameOverDialog from './GameOverDialog';
-import { type GameSettings } from '@/lib/othello/types';
+import { useEffect, useRef } from "react";
+import { useGame } from "@/hooks/useGame";
+import Board from "@/components/board/Board";
+import GameInfo from "./GameInfo";
+import MoveEvaluationDisplay from "./MoveEvaluation";
+import GameOverDialog from "./GameOverDialog";
+import { type GameSettings } from "@/lib/othello/types";
 
 interface GameControllerProps {
   settings: GameSettings;
   onBack: () => void;
 }
 
-export default function GameController({ settings, onBack }: GameControllerProps) {
+export default function GameController({
+  settings,
+  onBack,
+}: GameControllerProps) {
   const {
     settings: currentSettings,
     state,
@@ -28,6 +31,8 @@ export default function GameController({ settings, onBack }: GameControllerProps
     resetGame,
     toggleOpenness,
     clearEvaluation,
+    undoMove,
+    canUndo,
   } = useGame();
 
   const initialized = useRef(false);
@@ -62,24 +67,40 @@ export default function GameController({ settings, onBack }: GameControllerProps
       {/* Evaluation display */}
       {state.evaluation && (
         <div className="w-full max-w-[460px]">
-          <MoveEvaluationDisplay evaluation={state.evaluation} onClose={clearEvaluation} />
+          <MoveEvaluationDisplay
+            evaluation={state.evaluation}
+            onClose={clearEvaluation}
+          />
         </div>
       )}
 
       {/* Controls */}
       <div className="flex items-center gap-2 mt-1">
         <button
+          onClick={undoMove}
+          disabled={!canUndo}
+          className={`btn btn-secondary text-sm px-4 py-2 rounded-lg ${!canUndo ? "opacity-40 cursor-not-allowed" : ""}`}
+        >
+          ↩ 待った
+        </button>
+        <button
           onClick={toggleOpenness}
           className={`btn text-sm px-4 py-2 rounded-lg ${
-            currentSettings.showOpenness ? 'btn-primary' : 'btn-secondary'
+            currentSettings.showOpenness ? "btn-primary" : "btn-secondary"
           }`}
         >
-          開放度 {currentSettings.showOpenness ? 'ON' : 'OFF'}
+          開放度 {currentSettings.showOpenness ? "ON" : "OFF"}
         </button>
-        <button onClick={resetGame} className="btn btn-secondary text-sm px-4 py-2 rounded-lg">
+        <button
+          onClick={resetGame}
+          className="btn btn-secondary text-sm px-4 py-2 rounded-lg"
+        >
           リセット
         </button>
-        <button onClick={onBack} className="btn btn-secondary text-sm px-4 py-2 rounded-lg">
+        <button
+          onClick={onBack}
+          className="btn btn-secondary text-sm px-4 py-2 rounded-lg"
+        >
           設定に戻る
         </button>
       </div>

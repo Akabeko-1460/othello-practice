@@ -1,4 +1,4 @@
-import { BoardArray, BLACK, WHITE, EMPTY, type CellState } from './types';
+import { BoardArray, BLACK, WHITE, type CellState } from "./types";
 
 /** Create initial othello board */
 export function createBoard(): BoardArray {
@@ -17,12 +17,21 @@ export function cloneBoard(board: BoardArray): BoardArray {
 }
 
 /** Get cell value */
-export function getCell(board: BoardArray, row: number, col: number): CellState {
+export function getCell(
+  board: BoardArray,
+  row: number,
+  col: number,
+): CellState {
   return board[row * 8 + col] as CellState;
 }
 
 /** Set cell value */
-export function setCell(board: BoardArray, row: number, col: number, value: CellState): void {
+export function setCell(
+  board: BoardArray,
+  row: number,
+  col: number,
+  value: CellState,
+): void {
   board[row * 8 + col] = value;
 }
 
@@ -36,8 +45,14 @@ export function countStones(board: BoardArray, type: CellState): number {
 }
 
 /** Count all stones */
-export function countAll(board: BoardArray): { black: number; white: number; empty: number } {
-  let black = 0, white = 0, empty = 0;
+export function countAll(board: BoardArray): {
+  black: number;
+  white: number;
+  empty: number;
+} {
+  let black = 0,
+    white = 0,
+    empty = 0;
   for (let i = 0; i < 64; i++) {
     if (board[i] === BLACK) black++;
     else if (board[i] === WHITE) white++;

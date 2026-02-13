@@ -17,21 +17,36 @@ const AI_LEVELS: {
   value: AILevel;
   label: string;
   desc: string;
-  badge: string;
 }[] = [
-  { value: "beginner", label: "初心者", desc: "ランダムに打つ", badge: "★" },
-  { value: "elementary", label: "初級", desc: "多く取る＋隅優先", badge: "★★" },
+  {
+    value: "beginner",
+    label: "初心者",
+    desc: "ランダムに着手する",
+  },
+  {
+    value: "elementary",
+    label: "初級",
+    desc: "多く取る＋隅を優先",
+  },
   {
     value: "intermediate",
     label: "中級",
-    desc: "開放度＋位置評価",
-    badge: "★★★",
+    desc: "開放度・位置・手数を総合判断",
+  },
+  {
+    value: "semi_advanced",
+    label: "準上級",
+    desc: "4手先まで読む",
   },
   {
     value: "advanced",
     label: "上級",
-    desc: "先読み（Alpha-Beta）",
-    badge: "★★★★",
+    desc: "深い先読み＋反復深化",
+  },
+  {
+    value: "expert",
+    label: "超級",
+    desc: "最強・終盤完全読み",
   },
 ];
 
@@ -92,7 +107,7 @@ export default function GameSettingsPanel({ onStart }: GameSettingsProps) {
               CPUレベル
             </label>
             <div className="grid grid-cols-2 gap-2">
-              {AI_LEVELS.map(({ value, label, desc, badge }) => (
+              {AI_LEVELS.map(({ value, label, desc }) => (
                 <button
                   key={value}
                   onClick={() => setAiLevel(value)}
@@ -105,10 +120,7 @@ export default function GameSettingsPanel({ onStart }: GameSettingsProps) {
                     }
                   `}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-sm">{label}</span>
-                    <span className="text-[10px] text-amber-500">{badge}</span>
-                  </div>
+                  <div className="font-semibold text-sm">{label}</div>
                   <div className="text-xs text-text-muted mt-0.5">{desc}</div>
                 </button>
               ))}
